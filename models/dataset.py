@@ -8,6 +8,7 @@ import torchaudio
 from torch.utils.data import Dataset
 from scipy.io import wavfile
 import librosa
+from sklearn.utils import shuffle
 
 
 class ESC50Dataset(Dataset):
@@ -16,8 +17,9 @@ class ESC50Dataset(Dataset):
 		df = pd.read_csv("./meta/esc50.csv")
 		print(df)
 		file_path = df.filename.values
-		self.file_path = ["audio/"+x for x in file_path]
-		self.labels = df.target.values
+		file_path = ["audio/"+x for x in file_path]
+		labels = df.target.values
+		self.file_path, self.labels = shuffle(file_path, labels)
 
 	def __len__(self):
 		return len(self.labels)
@@ -29,6 +31,3 @@ class ESC50Dataset(Dataset):
 		MFCC = MFCC.unsqueeze(0)
 		label = torch.tensor(self.labels[idx])
 		return MFCC, label
-
-
-
