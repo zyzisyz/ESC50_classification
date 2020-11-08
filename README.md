@@ -1,7 +1,7 @@
 ## ESC-50 Classification
 
 - Dataset: [ESC-50](https://github.com/karolpiczak/ESC-50)
-- ESC-50 [Chinese Mirror](https://gitee.com/zyziszy/ESC-50.git)
+- [Chinese Mirror](https://gitee.com/zyziszy/ESC-50.git)
 
 ```bash
 # download dataset from Chinese Mirror(GitEE)
