@@ -5,5 +5,6 @@ python -u main.py \
 	--batch-size 64 \
 	--test-batch-size 150 \
 	--num-workers 20 \
+	--save-model \
 	--log-interval 1
 

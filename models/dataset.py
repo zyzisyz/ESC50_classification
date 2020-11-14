@@ -31,3 +31,4 @@ class ESC50Dataset(Dataset):
 		MFCC = MFCC.unsqueeze(0)
 		label = torch.tensor(self.labels[idx])
 		return MFCC, label
+
