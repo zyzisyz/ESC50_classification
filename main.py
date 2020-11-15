@@ -71,11 +71,14 @@ def main():
 	parser.add_argument('--log-interval', type=int, default=10, metavar='N',
 			help='how many batches to wait before logging training status')
 	parser.add_argument('--num-workers', type=int, default=10, help='how many workers to load the data')
+	parser.add_argument('--ckpt-path', type=str, default="", help='ckpt')
+	parser.add_argument('--ckpt-save-dir', type=str, default="ckpt", help='ckpt')
 	parser.add_argument('--save-model', action='store_true', default=False,
 			help='For Saving the current Model')
 	args = parser.parse_args()
+	print("ckpt_path")
+	print(args.ckpt_path)
 	use_cuda = not args.no_cuda and torch.cuda.is_available()
-
 	torch.manual_seed(args.seed)
 
 	device = torch.device("cuda" if use_cuda else "cpu")
@@ -102,14 +105,23 @@ def main():
 	model = resnet18(num_classes=50).to(device)
 	optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
+	## TODO ##
+	epoch_start = 1
+	if args.ckpt_path is not "":
+		print("loaded {}".format(args.ckpt_path))
+		model.load_state_dict(torch.load(args.ckpt_path))
+		epoch_start = int(args.ckpt_path.split("_")[-1].split(".")[0])
+	else:
+		pass
+
 	scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
-	for epoch in range(1, args.epochs + 1):
+	for epoch in range(epoch_start, args.epochs + 1):
 		train(args, model, device, train_loader, optimizer, epoch)
 		test(model, device, test_loader)
 		scheduler.step()
 
 		if args.save_model:
-			torch.save(model.state_dict(), "ckpt/ckpt_{}.pt".format(epoch))
+			torch.save(model.state_dict(), "{}/ckpt_{}.pt".format(args.ckpt_save_dir,epoch))
 
 
 if __name__ == '__main__':
