@@ -1,6 +1,6 @@
 #!/bin/bash
 
-stage=1
+stage=3
 echo This is stage: $stage
 
 if [ $stage -eq 1 ];then
@@ -16,6 +16,16 @@ fi
 
 if [ $stage -eq 3 ];then
 	echo griff lim aug
+	for file in `find ./data/train -name "*.wav"`
+	do
+		dst=${file%.*}_gl.wav
+		rm -rf $dst
+		echo $dst
+		python scripts/griffin_lim_aug.py \
+			--src_wav $file \
+			--dst_wav $dst
+	done
+	wait
 fi
 
 if [ $stage -eq 4 ];then

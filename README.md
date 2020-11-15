@@ -5,7 +5,7 @@
 
 ```bash
 # download dataset from Chinese Mirror(GitEE)
-bash script/download_ESC50.sh
+bash scripts/download_ESC50.sh
 
 # train and val
 bash run.sh
