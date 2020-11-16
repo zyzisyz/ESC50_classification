@@ -21,7 +21,7 @@ def load_file(csv_path="meta/esc50.csv", audio_dir="audio/"):
 
 if __name__ == "__main__":
 	file_path, labels = load_file()
-	train_path, test_path, train_label, test_label = train_test_split(file_path, labels, test_size=0.2, random_state=int(time.time()), shuffle=True)
+	train_path, test_path, train_label, test_label = train_test_split(file_path, labels, test_size=0.25, random_state=int(time.time()), shuffle=True)
 	for label in np.unique(labels):
 		if not os.path.exists("./data/train/{}".format(label)):
 			os.makedirs("./data/train/{}".format(label))

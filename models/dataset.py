@@ -7,7 +7,6 @@ import numpy as np
 import torch
 import torchaudio
 from torch.utils.data import Dataset
-from scipy.io import wavfile
 import librosa
 from sklearn.utils import shuffle
 
@@ -27,11 +26,28 @@ class ESC50Dataset(Dataset):
 
 	def __getitem__(self, idx):
 		waveform, samplerate = librosa.load(self.file_path[idx])
-		MFCC = librosa.feature.mfcc(y=waveform, sr=samplerate, n_mfcc=40).T
+		MFCC = librosa.feature.melspectrogram(y=waveform, sr=samplerate, center=False).T
 		MFCC = torch.from_numpy(MFCC.copy())
 		MFCC = MFCC.unsqueeze(0)
 		label = torch.tensor(self.labels[idx])
 		return MFCC, label
+
+
+class ESC50_Dataset(Dataset):
+	def __init__(self, audio_dir="data/train", extension="fbank"):
+		print("init {}...".format(audio_dir))
+		self.Seqs, _ = findAllSeqs(audio_dir, extension=extension)
+
+	def __len__(self):
+		return len(self.Seqs)
+
+	def __getitem__(self, idx):
+		Seq = self.Seqs[idx]
+		(label, path) = Seq
+		feature = torch.load(path)
+		feature = torch.from_numpy(feature.copy())
+		feature = feature.unsqueeze(0)
+		return feature, label
 
 
 def findAllSeqs(dirName, extension='.wav'):

@@ -1,12 +1,14 @@
 #!/bin/bash
 
+
+#--ckpt-path "ckpt/ckpt_3.pt" 
+
 python -u main.py \
-	--epochs 20 \
-	--batch-size 64 \
+	--epochs 50 \
+	--batch-size 100 \
 	--test-batch-size 150 \
-	--num-workers 20 \
+	--num-workers 40 \
 	--save-model \
 	--log-interval 1 \
-	--ckpt-path "ckpt/ckpt_3.pt" \
 	--ckpt-save-dir ckpt
 

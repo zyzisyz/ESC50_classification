@@ -2,6 +2,8 @@
 # coding=utf-8
 
 from __future__ import print_function
+import os
+
 import argparse
 import torch
 import torch.nn as nn
@@ -10,7 +12,7 @@ import torch.optim as optim
 from torchvision import datasets, transforms
 from torch.optim.lr_scheduler import StepLR
 
-from models import ESC50Dataset
+from models import ESC50_Dataset
 from models import resnet34, resnet18
 
 def train(args, model, device, train_loader, optimizer, epoch):
@@ -76,8 +78,7 @@ def main():
 	parser.add_argument('--save-model', action='store_true', default=False,
 			help='For Saving the current Model')
 	args = parser.parse_args()
-	print("ckpt_path")
-	print(args.ckpt_path)
+
 	use_cuda = not args.no_cuda and torch.cuda.is_available()
 	torch.manual_seed(args.seed)
 
@@ -93,12 +94,9 @@ def main():
 		train_kwargs.update(cuda_kwargs)
 		test_kwargs.update(cuda_kwargs)
 
-	full_dataset = ESC50Dataset()
+	train_dataset = ESC50_Dataset(audio_dir="data/train", extension="fbank")
+	test_dataset = ESC50_Dataset(audio_dir="data/test", extension="fbank")
 
-	train_size = int(0.9 * len(full_dataset))
-	test_size = len(full_dataset) - train_size
-
-	train_dataset, test_dataset = torch.utils.data.random_split(full_dataset, [train_size, test_size])
 	train_loader = torch.utils.data.DataLoader(train_dataset,**train_kwargs)
 	test_loader = torch.utils.data.DataLoader(test_dataset, **test_kwargs)
 
@@ -110,9 +108,15 @@ def main():
 	if args.ckpt_path is not "":
 		print("loaded {}".format(args.ckpt_path))
 		model.load_state_dict(torch.load(args.ckpt_path))
-		epoch_start = int(args.ckpt_path.split("_")[-1].split(".")[0])
+		epoch_start = int(args.ckpt_path.split("_")[-1].split(".")[0]) + 1
 	else:
-		pass
+		ckpts = os.listdir(args.ckpt_save_dir)
+		if len(ckpts) is not 0:
+			ckpts = [int(name.split("_")[-1].split(".")[0]) for name in ckpts]
+			ckpts.sort()
+			epoch_start = ckpts[-1]+1
+			print("loaded {}/ckpt_{}.pt".format(args.ckpt_save_dir, ckpts[-1]))
+			model.load_state_dict(torch.load("{}/ckpt_{}.pt".format(args.ckpt_save_dir, ckpts[-1])))
 
 	scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
 	for epoch in range(epoch_start, args.epochs + 1):

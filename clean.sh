@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for suffix in MFCC Fbank _tmp.wav* _16000.wav* _32000.wav* _8000.wav* _gl.wav*
+for suffix in fbank mfcc _tmp.wav* _16000.wav* _32000.wav* _8000.wav* _gl.wav* npy
 do
 	for file in `find ./data -name *$suffix`
 	do
