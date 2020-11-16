@@ -1,6 +1,6 @@
 #!/bin/bash
 
-stage=4
+stage=5
 echo This is stage: $stage
 
 nj=60
@@ -39,7 +39,29 @@ if [ $stage -eq 3 ];then
 	wait
 fi
 
+
 if [ $stage -eq 4 ];then
+	echo world aug
+	for i in `seq 0 49`
+	do
+		for file in `find ./data/train/$i -name "*.wav"`
+		do
+			{
+				dst=${file%.*}_world.wav
+				rm -rf $dst
+				echo $dst
+				python scripts/world_aug.py \
+					--src_wav $file \
+					--dst_wav $dst
+			}&
+		done
+		wait
+	done
+	wait
+fi
+
+
+if [ $stage -eq 5 ];then
 	echo make Fbanks
 
 	echo prepare $data_dir...
@@ -65,8 +87,9 @@ if [ $stage -eq 4 ];then
 
 	utils/run.pl JOB=1:$nj ark/sdata/log/JOB.log \
 		compute-${type}-feats --config="conf/${type}.conf" scp:ark/sdata/JOB ark:- \| \
-		apply-cmvn-sliding --norm-vars=false --center=true --cmn-window=498 ark:- ark:ark/${type}/JOB.ark \
+		apply-cmvn-sliding --norm-vars=false --center=false --cmn-window=498 ark:- ark:ark/${type}/JOB.ark \
 		|| exit 1;
+
 
 	echo make $type
 	utils/run.pl JOB=1:$nj ark/sdata/log/JOB.log \
